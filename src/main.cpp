@@ -162,15 +162,68 @@ int main() {
     imshow("Eroded", eroded);
     imshow("Flood Fill", flooded);
 
+    // 绘制圆形
+    Mat imageWithCircle = image.clone();
+    Point center(200, 200); // 圆心坐标
+    int radius = 50; // 半径
+    Scalar circleColor(0, 255, 0); // 绿色
+    circle(imageWithCircle, center, radius, circleColor, 2); // 线宽为2
+    imwrite("circle.png", imageWithCircle); // 保存绘制圆形后的图像
+
+    // 绘制方形
+    Mat imageWithRectangle = image.clone();
+    Point topLeft(100, 100); // 方形左上角坐标
+    Point bottomRight(150, 150); // 方形右下角坐标
+    Scalar rectColor(255, 0, 0); // 蓝色
+    rectangle(imageWithRectangle, topLeft, bottomRight, rectColor, 2); // 线宽为2
+    imwrite("rectangle.png", imageWithRectangle); // 保存绘制方形后的图像
+
+    // 绘制文字
+    Mat imageWithText = image.clone();
+    String text = "OpenCV Drawing"; // 文字内容
+    Point textOrg(100, 250); // 文字起始坐标
+    Scalar textColor(255, 255, 255); // 白色
+    int fontFace = FONT_HERSHEY_SIMPLEX;
+    double fontScale = 1;
+    int thickness = 2;
+    putText(imageWithText, text, textOrg, fontFace, fontScale, textColor, thickness);
+    imwrite("text.png", imageWithText); // 保存绘制文字后的图像
+
+    // 找到红色区域的轮廓
+    Mat hsvImage;
+    cvtColor(image, hsvImage, COLOR_BGR2HSV);
+    Scalar lowerRed1(0, 100, 100);
+    Scalar upperRed1(10, 255, 255);
+    Scalar lowerRed2(160, 100, 100);
+    Scalar upperRed2(180, 255, 255);
+    Mat mask1, mask2, mask;
+    inRange(hsvImage, lowerRed1, upperRed1, mask1);
+    inRange(hsvImage, lowerRed2, upperRed2, mask2);
+    bitwise_or(mask1, mask2, mask);
+
+    // 绘制红色外轮廓
+    vector<vector<Point>> contours;
+    findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    Mat imageWithContours = image.clone();
+    for (const auto& contour : contours) {
+        drawContours(imageWithContours, vector<vector<Point>>{contour}, -1, Scalar(0, 0, 255), 2); // 红色外轮廓
+    }
+    imwrite("contours.png", imageWithContours); // 保存绘制红色外轮廓后的图像
+
+    // 绘制红色bounding box
+    Mat imageWithBoundingBoxes = image.clone();
+    for (const auto& contour : contours) {
+        Rect boundingBox = boundingRect(contour);
+        rectangle(imageWithBoundingBoxes, boundingBox, Scalar(0, 0, 255), 2); // 红色bounding box
+    }
+    imwrite("bounding_boxes.png", imageWithBoundingBoxes); // 保存绘制红色bounding box后的图像
+
     // 读取图像
     Mat image = imread("/home/xiewanhao/opencv_project/resources/test_image.png"); 
     if (image.empty()) {
         cout << "Could not open or find the image!" << endl;
         return -1;
     }
-
-    // 保存原始图像
-    imwrite("original.png", image);
 
     // 图像旋转 35 度
     Point2f center(image.cols / 2.0, image.rows / 2.0);
