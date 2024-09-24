@@ -27,6 +27,8 @@ int main() {
     imshow("HSV Image", hsv);
     waitKey(0);
 
+    // yanhan
+
     // 读取图片
     Mat img = imread("/home/xiewanhao/opencv_project/resources/test_image.png");
     if (img.empty()) {
